@@ -1,0 +1,14 @@
+{
+  "name": "defold-mcp-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Desktop app for managing the Defold MCP server: console, start/stop, agent auto-configuration",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

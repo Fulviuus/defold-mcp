@@ -1,0 +1,29 @@
+[package]
+name = "defold-mcp-desktop"
+version = "1.0.0"
+description = "Desktop manager for the Defold MCP server"
+edition = "2021"
+license = "MIT"
+
+[lib]
+name = "defold_mcp_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+# preserve_order: agent config files must keep the user's key ordering on rewrite
+serde_json = { version = "1", features = ["preserve_order"] }
+toml_edit = "0.22"
+dirs = "5"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+strip = true
+lto = true

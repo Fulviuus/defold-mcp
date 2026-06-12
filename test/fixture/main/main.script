@@ -1,0 +1,10 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	print("fixture game started")
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("jump") and action.pressed then
+		msg.post("/player#player", "damage", { amount = 1 })
+	end
+end

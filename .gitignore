@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.claude/
+*.log
+.DS_Store
+test/fixture/build/
+test/fixture/.internal/
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+desktop/src-tauri/resources/

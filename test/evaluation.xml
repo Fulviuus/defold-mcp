@@ -1,0 +1,52 @@
+<!--
+  Evaluation set for defold-mcp-server (per the MCP builder guidelines).
+
+  Harness setup: run the server with
+    DEFOLD_PROJECT_ROOT=<repo>/test/fixture
+  All questions are read-only and answerable exclusively through the server's
+  tools (defold_parse_resource, defold_find_references, defold_get_settings,
+  defold_project_info, defold_list_resources, defold_api_search,
+  defold_api_doc). API questions pin version 1.12.4 so answers are stable.
+-->
+<evaluation>
+  <qa_pair>
+    <question>In this Defold project, the main collection contains one embedded game object instance. A script component is attached to it. What is the id of that embedded instance?</question>
+    <answer>controller</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>The instance with id "player" in the project's main collection references a game object prototype file. What is the file name of that prototype, without its directory path?</question>
+    <answer>player.go</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Among the script files in this project, one declares script properties via go.property. How many go.property definitions does it contain?</question>
+    <answer>2</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>The player script in this project requires exactly one Lua module. What is the dotted module name passed to require?</question>
+    <answer>main.utils</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Besides "damage", what other message id does the on_message function of /main/player.script compare against?</question>
+    <answer>heal</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>Exactly one project file references /main/player.script. Considering only its file name without directories, which file is it?</question>
+    <answer>player.go</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>What display width does this project's game.project configure?</question>
+    <answer>1024</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>According to the Defold 1.12.4 Lua API reference, how many parameters does go.animate accept in total, including optional ones?</question>
+    <answer>8</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>According to the Defold 1.12.4 Lua API reference, timer.delay returns a single value. What is the name of that return value?</question>
+    <answer>handle</answer>
+  </qa_pair>
+  <qa_pair>
+    <question>In the Defold 1.12.4 API reference, the sys namespace documents a message that shows or hides the on-screen profiler. What is the exact message name?</question>
+    <answer>toggle_profile</answer>
+  </qa_pair>
+</evaluation>

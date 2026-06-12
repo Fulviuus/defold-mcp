@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Defold MCP Server</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <h1>Defold MCP Server</h1>
+    </div>
+    <div id="status-pill" class="pill stopped">stopped</div>
+  </header>
+
+  <main>
+    <section class="card" id="server-card">
+      <h2>Server</h2>
+      <div class="grid">
+        <label>Host
+          <select id="host">
+            <option value="127.0.0.1">127.0.0.1 (this machine only)</option>
+            <option value="0.0.0.0">0.0.0.0 (whole network — careful)</option>
+          </select>
+        </label>
+        <label>Port
+          <input type="number" id="port" min="1" max="65535" value="9810" />
+        </label>
+        <label class="wide">Defold project root
+          <span class="row">
+            <input type="text" id="project_root" placeholder="(optional — agents can also pass project_root per call)" />
+            <button id="browse" class="secondary" title="Pick a folder">Browse…</button>
+          </span>
+        </label>
+      </div>
+      <details id="advanced">
+        <summary>Advanced paths</summary>
+        <div class="grid">
+          <label class="wide">Node executable
+            <input type="text" id="node_path" />
+          </label>
+          <label class="wide">JAVA_HOME (for bob.jar builds)
+            <input type="text" id="java_home" />
+          </label>
+        </div>
+      </details>
+      <div class="actions">
+        <button id="start" class="primary">▶ Start server</button>
+        <button id="stop" class="danger" disabled>■ Stop</button>
+        <span id="url-display" class="muted"></span>
+      </div>
+    </section>
+
+    <section class="card" id="agents-card">
+      <h2>Connect an AI agent</h2>
+      <div class="agent-row">
+        <label>Agent
+          <select id="agent-select"></select>
+        </label>
+        <label>Transport
+          <select id="mode-select">
+            <option value="http">HTTP (this managed server)</option>
+            <option value="stdio">stdio (agent spawns its own)</option>
+          </select>
+        </label>
+        <button id="configure" class="primary">Configure</button>
+      </div>
+      <p id="agent-note" class="muted"></p>
+      <div id="configure-result" class="result hidden">
+        <p id="result-message"></p>
+        <p class="muted" id="result-paths"></p>
+        <pre id="result-snippet"></pre>
+        <div class="actions">
+          <button id="copy-snippet" class="secondary">Copy snippet</button>
+          <button id="reveal-config" class="secondary">Reveal config file</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card grow" id="console-card">
+      <div class="console-head">
+        <h2>Console</h2>
+        <div class="actions">
+          <label class="checkbox"><input type="checkbox" id="autoscroll" checked /> Auto-scroll</label>
+          <button id="clear-console" class="secondary">Clear</button>
+        </div>
+      </div>
+      <pre id="console" tabindex="0"></pre>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>

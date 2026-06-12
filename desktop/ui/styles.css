@@ -1,0 +1,158 @@
+:root {
+  --bg: #16181d;
+  --card: #1f232b;
+  --card-border: #2c313c;
+  --text: #e8eaf0;
+  --muted: #8b93a5;
+  --accent: #ff6e3d;       /* Defold-ish orange */
+  --accent-dim: #b34c2a;
+  --ok: #34c97b;
+  --err: #ff5c5c;
+  --warn: #ffc14d;
+  font-size: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--card-border);
+  -webkit-user-select: none;
+  user-select: none;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+h1 { font-size: 16px; margin: 0; font-weight: 600; }
+h2 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+
+.pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+}
+.pill.running { background: rgba(52, 201, 123, 0.15); color: var(--ok); }
+.pill.stopped { background: rgba(139, 147, 165, 0.15); color: var(--muted); }
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 18px;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+.card.grow { flex: 1; display: flex; flex-direction: column; min-height: 180px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 10px 14px;
+}
+label { display: flex; flex-direction: column; gap: 4px; color: var(--muted); font-size: 12px; }
+label.wide { grid-column: 1 / -1; }
+.row { display: flex; gap: 8px; }
+.row input { flex: 1; }
+
+input, select {
+  background: #14161b;
+  color: var(--text);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 7px 9px;
+  font-size: 13px;
+  font-family: inherit;
+}
+input:focus, select:focus { outline: 1px solid var(--accent-dim); }
+
+details { margin-top: 10px; }
+summary { cursor: pointer; color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+
+.actions { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+
+button {
+  border: none;
+  border-radius: 7px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+button:disabled { opacity: 0.45; cursor: default; }
+button.primary { background: var(--accent); color: #fff; }
+button.primary:not(:disabled):hover { background: #ff8257; }
+button.danger { background: rgba(255, 92, 92, 0.16); color: var(--err); }
+button.danger:not(:disabled):hover { background: rgba(255, 92, 92, 0.28); }
+button.secondary { background: #2a2f3a; color: var(--text); }
+button.secondary:not(:disabled):hover { background: #353b48; }
+
+.muted { color: var(--muted); font-size: 12px; }
+
+.agent-row {
+  display: grid;
+  grid-template-columns: 1fr 240px auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.result {
+  margin-top: 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #181b21;
+}
+.result.hidden { display: none; }
+.result pre {
+  background: #101317;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 12px;
+  overflow-x: auto;
+  max-height: 180px;
+}
+
+.console-head { display: flex; justify-content: space-between; align-items: center; }
+.console-head .actions { margin: 0; }
+.checkbox { flex-direction: row; align-items: center; gap: 6px; }
+
+#console {
+  flex: 1;
+  margin: 10px 0 0;
+  background: #101317;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  font-family: "SF Mono", ui-monospace, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  min-height: 120px;
+}
+.log-err { color: var(--err); }
+.log-warn { color: var(--warn); }
+.log-meta { color: var(--muted); }
+.log-tool { color: var(--ok); }

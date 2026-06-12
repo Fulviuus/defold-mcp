@@ -1,0 +1,27 @@
+local utils = require "main.utils"
+
+go.property("speed", 100)
+go.property("health", 3)
+
+function init(self)
+	self.dir = vmath.vector3()
+end
+
+function update(self, dt)
+	go.set_position(go.get_position() + self.dir * self.speed * dt)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("damage") then
+		self.health = self.health - message.amount
+		if self.health <= 0 then
+			go.delete()
+		end
+	elseif message_id == hash("heal") then
+		self.health = utils.clamp(self.health + message.amount, 0, 3)
+	end
+end
+
+local function helper(x)
+	return utils.clamp(x, 0, 1)
+end
