@@ -1,6 +1,6 @@
 {
   "name": "defold-mcp-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MCP server for the Defold game engine: project inspection, game.project editing, bob builds and bundles, running games, hot reload, live engine control and API documentation search",
   "license": "MIT",
   "type": "module",

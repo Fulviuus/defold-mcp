@@ -5,6 +5,7 @@ import { resolveProjectRoot } from "../context.js";
 import { runBob } from "../services/bob.js";
 import { engineInfo, enginePing, enginePost } from "../services/engine.js";
 import { engineLogs } from "../state.js";
+import { readLogPage } from "../services/processes.js";
 import {
   encodeEmpty,
   encodeExit,
@@ -342,22 +343,7 @@ export function registerEngineTools(server: McpServer): void {
         }
 
         // read
-        let lines: string[];
-        let start: number;
-        let total: number;
-        if (args.filter) {
-          const needle = args.filter.toLowerCase();
-          const everything = conn.logs.slice(conn.logs.firstRetained, conn.logs.total);
-          const filtered = everything.lines.filter((l) => l.toLowerCase().includes(needle));
-          total = filtered.length;
-          start = args.offset < 0 ? Math.max(0, total + args.offset) : Math.min(args.offset, total);
-          lines = filtered.slice(start, start + args.limit);
-        } else {
-          const page = conn.logs.slice(args.offset, args.limit);
-          lines = page.lines;
-          start = page.start;
-          total = page.total;
-        }
+        const { lines, start, total } = readLogPage(conn.logs, args.offset, args.limit, args.filter);
         return textResult(
           [
             `${conn.host}:${conn.port} (${conn.status}) — lines ${start}..${start + lines.length} of ${total}` +

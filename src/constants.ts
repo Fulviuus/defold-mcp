@@ -1,5 +1,5 @@
 export const SERVER_NAME = "defold-mcp-server";
-export const SERVER_VERSION = "1.0.0";
+export const SERVER_VERSION = "1.0.1";
 
 /** Defold official download host (engine archives, bob, ref-doc). */
 export const D_DEFOLD_BASE = "https://d.defold.com";

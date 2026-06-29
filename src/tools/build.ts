@@ -30,7 +30,6 @@ export const KNOWN_PLATFORMS = [
   "x86_64-ios",
   "armv7-android",
   "arm64-android",
-  "js-web",
   "wasm-web",
   "wasm_pthread-web",
 ] as const;

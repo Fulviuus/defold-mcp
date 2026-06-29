@@ -1,6 +1,6 @@
 [package]
 name = "defold-mcp-desktop"
-version = "1.0.0"
+version = "1.0.1"
 description = "Desktop manager for the Defold MCP server"
 edition = "2021"
 license = "MIT"

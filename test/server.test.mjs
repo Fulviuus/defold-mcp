@@ -5,7 +5,7 @@
  */
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
-import { cp, mkdtemp, readFile, stat } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, stat, writeFile } from "node:fs/promises";
 import http from "node:http";
 import net from "node:net";
 import os from "node:os";
@@ -76,6 +76,31 @@ function startFakeEngine() {
   });
 }
 
+// Fake Defold editor HTTP server exposing the 1.13.0 streaming console.
+let editorServer;
+let editorPort;
+function startFakeEditor() {
+  return new Promise((resolve) => {
+    editorServer = http.createServer((req, res) => {
+      if (req.method === "GET" && req.url === "/console/stream") {
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        res.write("INFO:DLIB: Log server started on port 51990\n");
+        res.write("INFO:ENGINE: Engine service started on port 51991\n");
+        res.write("WARNING:BUILD: shader recompiled\n");
+        // keep the connection open (a real stream stays connected)
+        return;
+      }
+      res.statusCode = 404;
+      res.end("not found");
+    });
+    // Editors bind localhost; bind the same so the tool's localhost URL resolves.
+    editorServer.listen(0, "localhost", () => {
+      editorPort = editorServer.address().port;
+      resolve();
+    });
+  });
+}
+
 async function call(name, args = {}) {
   return client.callTool({ name, arguments: args });
 }
@@ -89,6 +114,10 @@ before(async () => {
   cacheDir = await mkdtemp(path.join(os.tmpdir(), "defold-mcp-cache-"));
   await cp(fixture, projectRoot, { recursive: true });
   await startFakeEngine();
+  await startFakeEditor();
+  // Emulate the editor having written its discovery port file.
+  await mkdir(path.join(projectRoot, ".internal"), { recursive: true });
+  await writeFile(path.join(projectRoot, ".internal", "editor.port"), String(editorPort));
 
   client = new Client({ name: "defold-mcp-tests", version: "1.0.0" });
   const transport = new StdioClientTransport({
@@ -108,14 +137,15 @@ after(async () => {
   await client?.close();
   engineServer?.close();
   logServer?.close();
+  editorServer?.close();
 });
 
 // ---------------------------------------------------------------------------
 
-test("lists all 25 tools with annotations", async () => {
+test("lists all 26 tools with annotations", async () => {
   const { tools } = await client.listTools();
   const names = tools.map((t) => t.name).sort();
-  assert.equal(tools.length, 25, `unexpected tool list: ${names.join(", ")}`);
+  assert.equal(tools.length, 26, `unexpected tool list: ${names.join(", ")}`);
   for (const expected of [
     "defold_project_info", "defold_get_settings", "defold_set_setting",
     "defold_list_dependencies", "defold_add_dependency", "defold_remove_dependency",
@@ -124,7 +154,7 @@ test("lists all 25 tools with annotations", async () => {
     "defold_build", "defold_bundle", "defold_clean", "defold_doctor",
     "defold_run", "defold_stop", "defold_game_logs", "defold_engine_info",
     "defold_hot_reload", "defold_engine_command", "defold_engine_logs",
-    "defold_api_search", "defold_api_doc",
+    "defold_editor_logs", "defold_api_search", "defold_api_doc",
   ]) {
     assert.ok(names.includes(expected), `missing tool ${expected}`);
   }
@@ -378,6 +408,37 @@ test("defold_engine_logs connect/read/disconnect via discovered log_port", async
 
   const disc = await call("defold_engine_logs", { action: "disconnect", host: "127.0.0.1" });
   assert.ok(!disc.isError);
+});
+
+test("defold_editor_logs streams the editor console via .internal/editor.port", async () => {
+  const conn = await call("defold_editor_logs", { action: "connect" });
+  assert.ok(!conn.isError, text(conn));
+  assert.match(text(conn), /connected/);
+
+  const read = await call("defold_editor_logs", { action: "read" });
+  assert.ok(!read.isError, text(read));
+  const body = text(read);
+  assert.match(body, /Engine service started on port 51991/);
+  assert.match(body, /shader recompiled/);
+  assert.match(body, new RegExp(`editor port ${editorPort}`));
+
+  const filtered = await call("defold_editor_logs", { action: "read", filter: "warning" });
+  assert.match(text(filtered), /shader recompiled/);
+  assert.ok(!text(filtered).includes("Engine service started"));
+
+  const status = await call("defold_editor_logs", { action: "status" });
+  assert.match(text(status), /editor port/);
+
+  const disc = await call("defold_editor_logs", { action: "disconnect" });
+  assert.ok(!disc.isError);
+});
+
+test("defold_editor_logs errors helpfully when no editor is running", async () => {
+  const noEditor = await mkdtemp(path.join(os.tmpdir(), "defold-noeditor-"));
+  await cp(fixture, noEditor, { recursive: true });
+  const res = await call("defold_editor_logs", { action: "connect", project_root: noEditor });
+  assert.ok(res.isError);
+  assert.match(text(res), /editor\.port|Defold editor/i);
 });
 
 // --- toolchain-dependent tools degrade gracefully ----------------------------

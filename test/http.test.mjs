@@ -59,7 +59,7 @@ test("GET /health returns status JSON with CORS header and no sensitive fields",
   const health = await res.json();
   assert.equal(health.name, "defold-mcp-server");
   assert.equal(health.transport, "http");
-  assert.equal(health.tools, 25);
+  assert.equal(health.tools, 26);
   // CORS-readable body must not leak paths or pids
   assert.equal(health.project_root_env, undefined);
   assert.equal(health.pid, undefined);
@@ -93,7 +93,7 @@ test("requests with a non-allowlisted Host header are rejected (DNS rebinding)",
 
 test("tools/list works over HTTP", async () => {
   const { tools } = await client.listTools();
-  assert.equal(tools.length, 25);
+  assert.equal(tools.length, 26);
 });
 
 test("tool calls work over HTTP (defold_project_info)", async () => {

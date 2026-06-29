@@ -22,6 +22,7 @@ import { runHttpServer } from "./http.js";
 import { shutdown } from "./state.js";
 import { registerBuildTools } from "./tools/build.js";
 import { registerDocTools } from "./tools/docs.js";
+import { registerEditorTools } from "./tools/editor.js";
 import { registerEngineTools } from "./tools/engine.js";
 import { registerProjectTools } from "./tools/project.js";
 import { registerResourceTools } from "./tools/resources.js";
@@ -94,11 +95,12 @@ export function createServer(): McpServer {
   registerBuildTools(server);
   registerRunTools(server);
   registerEngineTools(server);
+  registerEditorTools(server);
   registerDocTools(server);
   return server;
 }
 
-export const TOOL_COUNT = 25;
+export const TOOL_COUNT = 26;
 
 interface CliOptions {
   transport: "stdio" | "http";

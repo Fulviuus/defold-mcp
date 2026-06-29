@@ -240,6 +240,7 @@ If the client enforces per-tool timeouts, raise them for the build tools (first 
 | `defold_hot_reload` | Compile and hot-swap resources into the running game. |
 | `defold_engine_command` | `@system` commands: toggle_profile, toggle_physics_debug, set_update_frequency, set_vsync, start/stop_record, reboot, exit, ... |
 | `defold_engine_logs` | Stream the engine TCP log service (works for editor-launched games and devices too). |
+| `defold_editor_logs` | Stream the running Defold editor's console (build + engine output) via its `/console/stream` HTTP endpoint (Defold 1.13.0+). |
 
 ### API reference
 | Tool | Description |

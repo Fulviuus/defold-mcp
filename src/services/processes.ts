@@ -41,6 +41,34 @@ export class RingBuffer {
   }
 }
 
+export interface LogPage {
+  lines: string[];
+  start: number;
+  total: number;
+}
+
+/**
+ * Page through a ring buffer with an optional case-insensitive substring
+ * filter. Negative offset counts from the end. Shared by the game/engine/
+ * editor log tools so they page identically.
+ */
+export function readLogPage(
+  ring: RingBuffer,
+  offset: number,
+  limit: number,
+  filter?: string
+): LogPage {
+  if (filter) {
+    const needle = filter.toLowerCase();
+    const everything = ring.slice(ring.firstRetained, ring.total);
+    const filtered = everything.lines.filter((l) => l.toLowerCase().includes(needle));
+    const total = filtered.length;
+    const start = offset < 0 ? Math.max(0, total + offset) : Math.min(offset, total);
+    return { lines: filtered.slice(start, start + limit), start, total };
+  }
+  return ring.slice(offset, limit);
+}
+
 /** Incrementally split a byte stream into lines. */
 export function makeLineSplitter(onLine: (line: string) => void): {
   push: (chunk: Buffer) => void;
