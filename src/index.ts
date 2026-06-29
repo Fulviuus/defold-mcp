@@ -27,6 +27,7 @@ import { registerEngineTools } from "./tools/engine.js";
 import { registerProjectTools } from "./tools/project.js";
 import { registerResourceTools } from "./tools/resources.js";
 import { registerRunTools } from "./tools/run.js";
+import { registerScreenshotTools } from "./tools/screenshot.js";
 import { logLine } from "./util/log.js";
 
 function printHelp(): void {
@@ -96,11 +97,12 @@ export function createServer(): McpServer {
   registerRunTools(server);
   registerEngineTools(server);
   registerEditorTools(server);
+  registerScreenshotTools(server);
   registerDocTools(server);
   return server;
 }
 
-export const TOOL_COUNT = 26;
+export const TOOL_COUNT = 27;
 
 interface CliOptions {
   transport: "stdio" | "http";

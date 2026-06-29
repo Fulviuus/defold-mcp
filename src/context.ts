@@ -1,3 +1,4 @@
+import { realpathSync } from "node:fs";
 import { access, stat } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -82,17 +83,50 @@ export function gameProjectPath(root: string): string {
   return path.join(root, "game.project");
 }
 
+/** realpath the nearest existing ancestor of `p`, re-appending the missing tail. */
+function realpathOfNearestAncestor(p: string): string {
+  let cur = p;
+  const tail: string[] = [];
+  for (;;) {
+    try {
+      const real = realpathSync(cur);
+      return tail.length > 0 ? path.join(real, ...tail.reverse()) : real;
+    } catch {
+      const parent = path.dirname(cur);
+      if (parent === cur) return p; // hit filesystem root without resolving
+      tail.push(path.basename(cur));
+      cur = parent;
+    }
+  }
+}
+
 /**
  * Convert a Defold resource path ("/main/player.script") or a relative path
  * into an absolute filesystem path, rejecting traversal outside the project.
+ *
+ * The check is both lexical (blocks ../ and absolute escapes) and
+ * symlink-aware: the nearest existing ancestor of the target is realpath'd and
+ * compared against the realpath'd project root, so a symlink planted inside the
+ * project cannot redirect reads/writes outside it.
  */
 export function resourceToAbsolute(root: string, resourcePath: string): string {
   const rel = resourcePath.replace(/^\/+/, "");
-  const abs = path.resolve(root, rel);
   const normalizedRoot = path.resolve(root);
-  if (abs !== normalizedRoot && !abs.startsWith(normalizedRoot + path.sep)) {
+  const abs = path.resolve(normalizedRoot, rel);
+  const escapes = (child: string, base: string): boolean =>
+    child !== base && !child.startsWith(base + path.sep);
+
+  if (escapes(abs, normalizedRoot)) {
     throw new ToolFailure(
       `Path '${resourcePath}' escapes the project root. Use project-relative paths like "/main/player.script".`
+    );
+  }
+  // Symlink-aware re-check on the resolved real paths.
+  const realRoot = realpathOfNearestAncestor(normalizedRoot);
+  const realAbs = realpathOfNearestAncestor(abs);
+  if (escapes(realAbs, realRoot)) {
+    throw new ToolFailure(
+      `Path '${resourcePath}' resolves (via a symlink) outside the project root, which is not allowed.`
     );
   }
   return abs;

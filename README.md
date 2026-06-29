@@ -14,6 +14,7 @@ Everything works headlessly — no Defold editor required. A [desktop app](deskt
 - **Build pipeline** — download/cache `bob.jar` per Defold version, compile with structured error diagnostics (resource, line, message), bundle for all supported platforms, resolve dependencies.
 - **Run & debug loop** — download/cache the `dmengine` dev binary, launch the game in the background, read its logs incrementally, stop it gracefully.
 - **Live engine control** — hot reload changed scripts/resources into the running game (the same mechanism the editor uses), toggle the profiler and physics debug, set frame cap and vsync, record gameplay video, reboot or exit the engine, and stream engine logs over TCP — including from editor-launched games and devices on the network.
+- **Visual feedback** — screenshot the running game as an image the agent can actually look at, to verify rendering, layout and UI (not just logs).
 - **API documentation** — search and read the official Defold API reference for the exact engine version you build with (go, gui, msg, sys, physics, render, editor scripting, native extension SDK, ...).
 
 ## Requirements
@@ -241,6 +242,7 @@ If the client enforces per-tool timeouts, raise them for the build tools (first 
 | `defold_engine_command` | `@system` commands: toggle_profile, toggle_physics_debug, set_update_frequency, set_vsync, start/stop_record, reboot, exit, ... |
 | `defold_engine_logs` | Stream the engine TCP log service (works for editor-launched games and devices too). |
 | `defold_editor_logs` | Stream the running Defold editor's console (build + engine output) via its `/console/stream` HTTP endpoint (Defold 1.13.0+). |
+| `defold_screenshot` | Capture a screenshot of the running game as a viewable image, so agents can visually verify rendering/layout/UI (macOS; requires Screen Recording permission). |
 
 ### API reference
 | Tool | Description |

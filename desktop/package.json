@@ -1,6 +1,6 @@
 {
   "name": "defold-mcp-desktop",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Desktop app for managing the Defold MCP server: console, start/stop, agent auto-configuration",
   "scripts": {

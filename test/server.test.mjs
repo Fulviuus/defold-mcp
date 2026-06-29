@@ -142,10 +142,10 @@ after(async () => {
 
 // ---------------------------------------------------------------------------
 
-test("lists all 26 tools with annotations", async () => {
+test("lists all 27 tools with annotations", async () => {
   const { tools } = await client.listTools();
   const names = tools.map((t) => t.name).sort();
-  assert.equal(tools.length, 26, `unexpected tool list: ${names.join(", ")}`);
+  assert.equal(tools.length, 27, `unexpected tool list: ${names.join(", ")}`);
   for (const expected of [
     "defold_project_info", "defold_get_settings", "defold_set_setting",
     "defold_list_dependencies", "defold_add_dependency", "defold_remove_dependency",
@@ -439,6 +439,24 @@ test("defold_editor_logs errors helpfully when no editor is running", async () =
   const res = await call("defold_editor_logs", { action: "connect", project_root: noEditor });
   assert.ok(res.isError);
   assert.match(text(res), /editor\.port|Defold editor/i);
+});
+
+test("defold_screenshot returns an image (with a display) or a clear capture error (headless)", async () => {
+  // Tolerant: a real display yields an image; headless CI / no permission /
+  // unsupported platform must yield an actionable error rather than a crash.
+  const res = await call("defold_screenshot", { max_width: 320, format: "jpeg" });
+  if (res.isError) {
+    assert.match(
+      text(res),
+      /Screen Recording|not yet implemented|capture failed|empty image|not supported/i
+    );
+  } else {
+    const img = res.content.find((c) => c.type === "image");
+    assert.ok(img, `expected an image content block, got: ${text(res)}`);
+    assert.ok((img.data?.length ?? 0) > 100, "image data should be non-trivial");
+    assert.match(img.mimeType, /image\/(jpeg|png)/);
+    assert.match(text(res), /Screenshot of/);
+  }
 });
 
 // --- toolchain-dependent tools degrade gracefully ----------------------------

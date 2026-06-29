@@ -6,6 +6,7 @@ const textproto = await import("../dist/util/textproto.js");
 const protobuf = await import("../dist/util/protobuf.js");
 const processes = await import("../dist/services/processes.js");
 const engineTools = await import("../dist/tools/engine.js");
+const context = await import("../dist/context.js");
 
 // ---------------------------------------------------------------------------
 // INI / game.project
@@ -173,6 +174,36 @@ test("compiledResourcePath maps source to built extensions", () => {
 // ---------------------------------------------------------------------------
 // RingBuffer
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// resourceToAbsolute path guard (traversal + symlink-aware)
+// ---------------------------------------------------------------------------
+
+test("resourceToAbsolute resolves in-project paths and blocks traversal + symlink escapes", async () => {
+  const { mkdtemp, mkdir, symlink, rm } = await import("node:fs/promises");
+  const os = await import("node:os");
+  const path = await import("node:path");
+  const root = await mkdtemp(path.join(os.tmpdir(), "defold-guard-"));
+  try {
+    // in-project resolves
+    assert.equal(context.resourceToAbsolute(root, "/main/x.script"), path.join(root, "main/x.script"));
+    assert.equal(context.resourceToAbsolute(root, "main/x.script"), path.join(root, "main/x.script"));
+
+    // lexical traversal blocked
+    assert.throws(() => context.resourceToAbsolute(root, "../escape.png"), /escapes the project root/);
+    assert.throws(() => context.resourceToAbsolute(root, "/sub/../../escape"), /escapes the project root/);
+
+    // symlink escape blocked: root/link -> os.tmpdir() (outside root)
+    await mkdir(path.join(root, "sub"), { recursive: true });
+    await symlink(os.tmpdir(), path.join(root, "link"));
+    assert.throws(
+      () => context.resourceToAbsolute(root, "/link/evil.png"),
+      /symlink.*outside the project root/
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 
 test("RingBuffer keeps absolute offsets after wrap", () => {
   const rb = new processes.RingBuffer(3);
